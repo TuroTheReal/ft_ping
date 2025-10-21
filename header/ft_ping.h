@@ -5,6 +5,7 @@
 #include <netdb.h>  // Pour getaddrinfo, struct addrinfo, gai_strerror
 #include <netinet/ip.h> // IPPROTO_IP
 #include <netinet/ip_icmp.h> // ICMP_ECHO, ICMP_ECHOREPLY
+#include <signal.h>  // Pour sigaction, SIGINT
 #include <stdint.h> // uint8_t, uint16_t, uint32_t
 #include <stdio.h> // printf(), fprintf(), perror()
 #include <stdlib.h> // exit(), atoi(), strtol()
@@ -45,9 +46,11 @@ typedef struct s_stats {
 } t_stats;
 
 
-void parse_args(int argc, char** argv, t_ping *ping);
-void print_help();
-void resolve_hostname(t_ping *ping);
+void	parse_args(int argc, char** argv, t_ping *ping);
+void	print_help();
+int		create_socket(t_ping *ping);
+void	resolve_hostname(t_ping *ping);
+void	setup_signal(t_ping *ping);
 
 // checksum ?
 // -? ?
