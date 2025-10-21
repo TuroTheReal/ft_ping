@@ -18,7 +18,7 @@ BONUS_FOLD = bonus/
 HEADER_FOLD = header/
 HEADER_SRC = ft_ping
 
-C_SRC = main
+C_SRC = main parse print
 # 		ping \
 # 		icmp \
 # 		network \
