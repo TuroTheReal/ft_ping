@@ -1,6 +1,8 @@
 #include <arpa/inet.h> // inet pton & ntop
 #include <ctype.h> // is*
 #include <getopt.h> // getopt()
+#include <math.h> // INFINITY
+#include <netdb.h>  // Pour getaddrinfo, struct addrinfo, gai_strerror
 #include <netinet/ip.h> // IPPROTO_IP
 #include <netinet/ip_icmp.h> // ICMP_ECHO, ICMP_ECHOREPLY
 #include <stdint.h> // uint8_t, uint16_t, uint32_t
@@ -29,6 +31,8 @@ typedef struct s_ping {
     struct sockaddr_in dest_addr;  // Adresse destination
     uint16_t pid;        // Process ID (pour l'ICMP ID)
     uint16_t seq;        // Numéro de séquence
+
+	struct timeval tv;
 } t_ping;
 
 typedef struct s_stats {
@@ -43,7 +47,7 @@ typedef struct s_stats {
 
 void parse_args(int argc, char** argv, t_ping *ping);
 void print_help();
-
+void resolve_hostname(t_ping *ping);
 
 // checksum ?
 // -? ?
@@ -99,14 +103,6 @@ void print_help();
 // icmp->icmp_cksum = checksum(icmp, packet_size);
 
 
-
-// FQDN
-// // Résoudre hostname → IP (OBLIGATOIRE à l'envoi)
-// struct addrinfo *result;
-// getaddrinfo(hostname, NULL, &hints, &result);
-
-// // MAIS : Ne PAS faire de reverse DNS sur les réponses !
-// // (Ne pas utiliser getnameinfo() sur les packets reçus)
 
 // RTT
 // struct timeval start, end;

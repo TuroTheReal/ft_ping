@@ -28,6 +28,10 @@ void parse_args(int argc,char** argv,t_ping *ping){
 					fprintf(stderr, "ping: invalid argument: '%s'\n", optarg);
 					exit(1);
 				}
+				if (ping->interval < 0.2 && getuid() != 0) {
+					fprintf(stderr, "ping: cannot flood; minimal interval allowed is 200ms\n");
+					exit(1);
+				}
 				break;
 			}
 
