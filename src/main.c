@@ -8,24 +8,24 @@ int create_socket(t_ping *ping)
 	// Création du socket RAW pour ICMP (nécessite sudo)
 	sockfd = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
 	if (sockfd < 0) {
-		perror("ft_ping: socket");
+		perror("socket");
 		exit(EXIT_FAILURE);
 	}
 
-	// Définir le TTL (Time To Live)
+	// Définir le TTL -ttl/t
 	if (setsockopt(sockfd, IPPROTO_IP, IP_TTL, &ttl, sizeof(ttl)) < 0) {
-		perror("ft_ping: setsockopt (TTL)");
+		perror("setsockopt (TTL)");
 		close(sockfd);
 		exit(EXIT_FAILURE);
 	}
 
-	// Timeout pour recvfrom (optionnel, utile plus tard)
+	// Timeout pour recvfrom -W
 	if (ping->timeout > 0) {
 		struct timeval tv;
 		tv.tv_sec = (int)ping->timeout;
 		tv.tv_usec = (ping->timeout - tv.tv_sec) * 1000000;
 		if (setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) < 0) {
-			perror("ft_ping: setsockopt (timeout)");
+			perror("setsockopt (timeout)");
 			close(sockfd);
 			exit(EXIT_FAILURE);
 		}
