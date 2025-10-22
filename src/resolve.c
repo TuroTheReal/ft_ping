@@ -13,14 +13,11 @@ void resolve_hostname(t_ping *ping){
 	status = getaddrinfo(ping->hostname, NULL, &hints, &result);
 	if (status != 0) {
 		fprintf(stderr, "ping: %s: %s\n", ping->hostname, gai_strerror(status));
+		cleanup(ping);
 		exit(EXIT_FAILURE);
 	}
 
 	memcpy(&ping->dest_addr, result->ai_addr, sizeof(struct sockaddr_in));
 
 	freeaddrinfo(result);
-
-	char ip_str[INET_ADDRSTRLEN];
-	inet_ntop(AF_INET, &ping->dest_addr.sin_addr, ip_str, INET_ADDRSTRLEN);
-	printf("PING %s (%s): %d data bytes\n", ping->hostname, ip_str, 56);
 }

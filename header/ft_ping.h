@@ -1,3 +1,6 @@
+#ifndef FT_PING_H
+#define FT_PING_H
+
 #include <arpa/inet.h> // inet pton & ntop
 #include <ctype.h> // is*
 #include <getopt.h> // getopt()
@@ -45,17 +48,23 @@ typedef struct s_stats {
     double rtt_sq_sum;   // Pour calculer mdev (écart-type)
 } t_stats;
 
+// Structure globale pour signal + stats
+typedef struct s_global {
+	t_ping *ping;
+	t_stats *stats;
+	int interrupted;
+} t_global;
 
 void	parse_args(int argc, char** argv, t_ping *ping);
 void	print_help();
 void	print_stats(t_ping *ping, t_stats *stats);
 int		create_socket(t_ping *ping);
 void	resolve_hostname(t_ping *ping);
-void	setup_signal(t_ping *ping);
+void	setup_signal(t_ping *ping, t_stats *stats);
 void	do_ping(t_ping *ping, t_stats *stats);
+void	cleanup(t_ping *ping);
 
-
-
+#endif
 // Structure : [Type][Code][Checksum][ID][Seq][Data]
 
 
