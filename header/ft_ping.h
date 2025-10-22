@@ -48,27 +48,14 @@ typedef struct s_stats {
 
 void	parse_args(int argc, char** argv, t_ping *ping);
 void	print_help();
+void	print_stats(t_ping *ping, t_stats *stats);
 int		create_socket(t_ping *ping);
 void	resolve_hostname(t_ping *ping);
 void	setup_signal(t_ping *ping);
-
-// checksum ?
-// -? ?
-// FQDN ?
-// tcpdump ?
-// icmp ?
+void	do_ping(t_ping *ping, t_stats *stats);
 
 
-// man 7 raw      # Raw sockets
-// man 7 icmp     # ICMP protocol
-// man 2 socket   # socket() syscall
 
-// Wikipedia ICMP (section "Echo request/reply") : https://en.wikipedia.org/wiki/Internet_Control_Message_Protocol
-// Retiens :
-
-// ICMP = protocole couche 3 (réseau)
-// Type 8 = Echo Request (ce qu'on envoie)
-// Type 0 = Echo Reply (ce qu'on reçoit)
 // Structure : [Type][Code][Checksum][ID][Seq][Data]
 
 

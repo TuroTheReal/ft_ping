@@ -18,13 +18,7 @@ BONUS_FOLD = bonus/
 HEADER_FOLD = header/
 HEADER_SRC = ft_ping
 
-C_SRC = main parse print socket resolve signal
-# 		ping \
-# 		icmp \
-# 		network \
-# 		stats \
-# 		utils \
-# 		errors
+C_SRC = main parse print socket resolve signal ping
 
 C_SRC_BONUS =
 
