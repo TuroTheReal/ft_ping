@@ -20,8 +20,13 @@ void print_stats(t_ping *ping, t_stats *stats) {
 		packet_loss = (int)(((stats->transmitted - stats->received) * 100.0) / stats->transmitted);
 	}
 
-	printf("%d packets transmitted, %d received, %d%% packet loss\n",
-		stats->transmitted, stats->received, packet_loss);
+	// Calculer temps total
+	struct timeval end_time, diff;
+	gettimeofday(&end_time, NULL);
+	timersub(&end_time, &ping->tv, &diff);
+	long total_ms = diff.tv_sec * 1000 + diff.tv_usec / 1000;
+
+	printf("%d packets transmitted, %d received, %d%% packet loss, time %ldms\n", stats->transmitted, stats->received, packet_loss, total_ms);
 
 	// Afficher les statistiques RTT si on a reçu au moins un paquet
 	if (stats->received > 0) {
@@ -35,3 +40,10 @@ void print_stats(t_ping *ping, t_stats *stats) {
 			stats->rtt_min, avg, stats->rtt_max, mdev);
 	}
 }
+
+
+
+
+
+// printf("...,);
+// ```

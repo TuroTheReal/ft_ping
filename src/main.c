@@ -17,7 +17,7 @@ int main(int ac, char **av) {
 		.ttl = 64,
 		.running = 1,
 		.pid = getpid() & 0xFFFF,
-		.seq = 0,
+		.seq = 1,
 		.sockfd = -1,
 		.hostname = NULL,
 		.verbose = 0
@@ -44,11 +44,14 @@ int main(int ac, char **av) {
 
 	ping.sockfd = create_socket(&ping);
 	resolve_hostname(&ping);
+
 	setup_signal(&ping, &stats);
+	gettimeofday(&ping.tv, NULL);
 
 	do_ping(&ping, &stats);
 
 	print_stats(&ping, &stats);
+	
 	cleanup(&ping);
 
 	return 0;
