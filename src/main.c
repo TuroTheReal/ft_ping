@@ -46,12 +46,14 @@ int main(int ac, char **av) {
 	resolve_hostname(&ping);
 
 	setup_signal(&ping, &stats);
-	gettimeofday(&ping.tv, NULL);
+	
+	gettimeofday(&ping.start_time, NULL);
+	ping.tv = ping.start_time;
 
 	do_ping(&ping, &stats);
 
 	print_stats(&ping, &stats);
-	
+
 	cleanup(&ping);
 
 	return 0;
