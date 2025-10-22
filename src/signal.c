@@ -6,7 +6,7 @@ void signal_handler(int signum) {
 	(void)signum;
 
 	if (g_data.interrupted) {
-		// Double SIGINT : forcer la sortie immédiate
+		// Double SIGINT : forcer la sortie 
 		if (g_data.ping && g_data.ping->sockfd >= 0) {
 			close(g_data.ping->sockfd);
 		}
@@ -19,7 +19,7 @@ void signal_handler(int signum) {
 		g_data.ping->running = 0;
 	}
 
-	// Afficher les stats immédiatement
+	// Afficher les stats
 	if (g_data.ping && g_data.stats) {
 		printf("\n");
 		print_stats(g_data.ping, g_data.stats);

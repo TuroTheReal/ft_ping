@@ -5,7 +5,7 @@ int create_socket(t_ping *ping)
 	int sockfd;
 	int ttl = ping->ttl;
 
-	// Création du socket RAW pour ICMP (nécessite sudo)
+	// Création du socket RAW pour ICMP (need sudo)
 	sockfd = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
 	if (sockfd < 0) {
 		perror("socket");

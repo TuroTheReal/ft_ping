@@ -58,6 +58,7 @@ typedef struct s_global {
 
 void	parse_args(int argc, char** argv, t_ping *ping);
 void	print_help();
+void	print_version();
 void	print_stats(t_ping *ping, t_stats *stats);
 int		create_socket(t_ping *ping);
 void	resolve_hostname(t_ping *ping);

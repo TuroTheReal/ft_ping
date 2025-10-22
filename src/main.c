@@ -13,7 +13,7 @@ int main(int ac, char **av) {
 		.count = 0,
 		.dest_addr = {0},
 		.interval = 1.0,
-		.timeout = 1.0,  // 1 seconde par défaut (comme ping standard)
+		.timeout = 1.0,
 		.ttl = 64,
 		.running = 1,
 		.pid = getpid() & 0xFFFF,
@@ -46,7 +46,7 @@ int main(int ac, char **av) {
 	resolve_hostname(&ping);
 
 	setup_signal(&ping, &stats);
-	
+
 	gettimeofday(&ping.start_time, NULL);
 	ping.tv = ping.start_time;
 

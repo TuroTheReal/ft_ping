@@ -36,9 +36,10 @@ void parse_args(int argc, char** argv, t_ping *ping) {
 
 	opterr = 0;  // Désactiver les messages d'erreur auto de getopt
 
-	while ((opt = getopt_long(argc, argv, "v?c:i:W:t:h", long_options, NULL)) != -1) {
+	while ((opt = getopt_long(argc, argv, "vV?c:i:W:t:h", long_options, NULL)) != -1) {
 		switch (opt) {
 			case 'v': ping->verbose = 1; break;
+			case 'V': print_version(); exit(0);
 			case 'c': {
 				char *endptr;
 				ping->count = strtol(optarg, &endptr, 10);

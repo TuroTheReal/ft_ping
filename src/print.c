@@ -1,5 +1,9 @@
 #include "ft_ping.h"
 
+void	print_version(){
+	printf("ping from Arthur Bernard 20251026\n");
+}
+
 void print_help() {
 	printf("Usage: ./ft_ping [options] <hostname>\n");
 	printf("Options:\n");
