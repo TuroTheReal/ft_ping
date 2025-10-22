@@ -58,7 +58,7 @@ int receive_ping(t_ping *ping, t_stats *stats) {
 	struct timeval deadline, now, timeout;
 	fd_set read_fds;
 
-	// ⭐ Calculer le temps limite (deadline)
+	// Calculer le temps limite (deadline)
 	double wait_time = (ping->timeout > 0) ? ping->timeout : ping->interval;
 	gettimeofday(&deadline, NULL);
 	deadline.tv_sec += (int)wait_time;
@@ -68,9 +68,9 @@ int receive_ping(t_ping *ping, t_stats *stats) {
 		deadline.tv_usec -= 1000000;
 	}
 
-	// ⭐ Boucle pour ignorer les paquets qui ne correspondent pas
+	// Boucle pour ignorer les paquets qui ne correspondent pas
 	while (ping->running) {
-		// ⭐ Calculer le temps restant avant deadline
+		// Calculer le temps restant avant deadline
 		gettimeofday(&now, NULL);
 
 		timeout.tv_sec = deadline.tv_sec - now.tv_sec;
@@ -81,7 +81,7 @@ int receive_ping(t_ping *ping, t_stats *stats) {
 			timeout.tv_usec += 1000000;
 		}
 
-		// ⭐ Si le timeout est dépassé
+		// Si le timeout est dépassé
 		if (timeout.tv_sec < 0) {
 			printf("Request timeout for icmp_seq %d\n", ping->seq);
 			return -1;
@@ -124,17 +124,17 @@ int receive_ping(t_ping *ping, t_stats *stats) {
 		uint16_t id = ntohs(icmp_hdr->icmp_id);
 		uint16_t seq = ntohs(icmp_hdr->icmp_seq);
 
-		// ⭐ Vérifier que c'est bien NOTRE paquet (bon PID)
+		// Vérifier que c'est bien NOTRE paquet (bon PID)
 		if (id != ping->pid) {
 			continue;  // Ignorer, c'est un autre processus ping
 		}
 
-		// ⭐ Vérifier la séquence
+		// Vérifier la séquence
 		if (seq != ping->seq) {
 			continue;  // Ignorer, c'est une vieille réponse ou un duplicata
 		}
 
-		// ⭐ On a reçu le bon paquet !
+		// On a reçu le bon paquet !
 		struct timeval recv_time;
 		gettimeofday(&recv_time, NULL);
 
