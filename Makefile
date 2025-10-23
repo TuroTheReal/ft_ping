@@ -20,7 +20,7 @@ HEADER_SRC = ft_ping
 
 C_SRC = main parse print socket resolve signal ping
 
-C_SRC_BONUS =
+C_SRC_BONUS = main parse print socket resolve signal ping
 
 # Headers
 HEADER_FLS = $(addsuffix .h, $(HEADER_SRC))
