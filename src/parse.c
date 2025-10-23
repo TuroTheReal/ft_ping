@@ -25,7 +25,6 @@ void validate_options(int argc, char **argv) {
 void parse_args(int argc, char** argv, t_ping *ping) {
 	int opt;
 	static struct option long_options[] = {
-		{"ttl", required_argument, NULL, 't'},
 		{"help", no_argument, NULL, 'h'},
 		{0, 0, 0, 0}
 	};
