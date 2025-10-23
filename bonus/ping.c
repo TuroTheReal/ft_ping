@@ -123,7 +123,7 @@ int receive_ping(t_ping *ping, t_stats *stats) {
 		int ttl = ip_hdr->ip_ttl;
 		uint16_t id, seq;
 
-		// NOUVEAU : Extraire id et seq selon le type de paquet
+		// Extraire id et seq selon le type de paquet
 		if (type == ICMP_TIME_EXCEEDED || type == ICMP_DEST_UNREACH) {
 			// Pour les erreurs ICMP, le paquet original est encapsulé
 			struct ip *orig_ip = (struct ip *)(buffer + ip_header_len + 8);
@@ -155,41 +155,6 @@ int receive_ping(t_ping *ping, t_stats *stats) {
 		double rtt = (recv_time.tv_sec - ping->tv.tv_sec) * 1000.0 +
 					 (recv_time.tv_usec - ping->tv.tv_usec) / 1000.0;
 
-		// // Traiter selon le type
-		// if (type == ICMP_ECHOREPLY) {
-		// 	stats->received++;
-
-		// 	if (rtt < stats->rtt_min) stats->rtt_min = rtt;
-		// 	if (rtt > stats->rtt_max) stats->rtt_max = rtt;
-		// 	stats->rtt_sum += rtt;
-		// 	stats->rtt_sq_sum += rtt * rtt;
-
-		// 	char ip_str[INET_ADDRSTRLEN];
-		// 	inet_ntop(AF_INET, &ip_hdr->ip_src, ip_str, sizeof(ip_str));
-		// 	printf("64 bytes from %s: icmp_seq=%d ttl=%d time=%.1f ms\n",
-		// 		   ip_str, seq, ttl, rtt);
-
-		// 	return 0;
-		// }
-		// else if (type == ICMP_TIME_EXCEEDED) {
-		// 	// MODIFIÉ : Afficher seulement si verbose
-		// 	if (ping->verbose) {
-		// 		char ip_str[INET_ADDRSTRLEN];
-		// 		inet_ntop(AF_INET, &ip_hdr->ip_src, ip_str, sizeof(ip_str));
-		// 		printf("From %s icmp_seq=%d Time to live exceeded\n", ip_str, seq);
-		// 	}
-		// 	return -1;
-		// }
-		// else if (type == ICMP_DEST_UNREACH) {
-		// 	// MODIFIÉ : Afficher seulement si verbose
-		// 	if (ping->verbose) {
-		// 		char ip_str[INET_ADDRSTRLEN];
-		// 		inet_ntop(AF_INET, &ip_hdr->ip_src, ip_str, sizeof(ip_str));
-		// 		printf("From %s icmp_seq=%d Destination Unreachable (code=%d)\n",
-		// 			   ip_str, seq, code);
-		// 	}
-		// 	return -1;
-		// }
 		// Traiter selon le type
 		if (type == ICMP_ECHOREPLY) {
 			stats->received++;
@@ -207,14 +172,12 @@ int receive_ping(t_ping *ping, t_stats *stats) {
 			return 0;
 		}
 		else if (type == ICMP_TIME_EXCEEDED) {
-			// CHANGEMENT : TOUJOURS afficher (pas seulement si verbose)
 			char ip_str[INET_ADDRSTRLEN];
 			inet_ntop(AF_INET, &ip_hdr->ip_src, ip_str, sizeof(ip_str));
 			printf("From %s icmp_seq=%d Time to live exceeded\n", ip_str, seq);
 			return -1;
 		}
 		else if (type == ICMP_DEST_UNREACH) {
-			// CHANGEMENT : TOUJOURS afficher (pas seulement si verbose)
 			char ip_str[INET_ADDRSTRLEN];
 			inet_ntop(AF_INET, &ip_hdr->ip_src, ip_str, sizeof(ip_str));
 			printf("From %s icmp_seq=%d Destination Unreachable (code=%d)\n",

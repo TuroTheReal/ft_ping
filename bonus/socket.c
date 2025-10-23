@@ -12,7 +12,7 @@ int create_socket(t_ping *ping)
 	}
 
 	// Définir le TTL SEULEMENT si spécifié par l'utilisateur (-t/--ttl)
-	if (ping->ttl > 0) {  // ← CHANGEMENT : check > 0 au lieu de toujours appliquer
+	if (ping->ttl > 0) {
 		if (setsockopt(sockfd, IPPROTO_IP, IP_TTL, &ping->ttl, sizeof(ping->ttl)) < 0) {
 			perror("setsockopt (TTL)");
 			close(sockfd);
