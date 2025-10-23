@@ -58,7 +58,7 @@ int receive_ping(t_ping *ping, t_stats *stats) {
 	struct timeval deadline, now, timeout;
 	fd_set read_fds;
 
-	// Calculer le temps limite (deadline)
+	// Calculer deadline
 	double wait_time = (ping->timeout > 0) ? ping->timeout : ping->interval;
 	gettimeofday(&deadline, NULL);
 	deadline.tv_sec += (int)wait_time;
@@ -70,7 +70,7 @@ int receive_ping(t_ping *ping, t_stats *stats) {
 
 	// Boucle pour ignorer les paquets qui ne correspondent pas
 	while (ping->running) {
-		// Calculer le temps restant avant deadline
+		// Calculer temps restant avant deadline
 		gettimeofday(&now, NULL);
 
 		timeout.tv_sec = deadline.tv_sec - now.tv_sec;
@@ -81,7 +81,7 @@ int receive_ping(t_ping *ping, t_stats *stats) {
 			timeout.tv_usec += 1000000;
 		}
 
-		// Si le timeout est dépassé
+		// timeout dépassé
 		if (timeout.tv_sec < 0) {
 			printf("Request timeout for icmp_seq %d\n", ping->seq);
 			return -1;
@@ -121,26 +121,41 @@ int receive_ping(t_ping *ping, t_stats *stats) {
 		int type = icmp_hdr->icmp_type;
 		int code = icmp_hdr->icmp_code;
 		int ttl = ip_hdr->ip_ttl;
-		uint16_t id = ntohs(icmp_hdr->icmp_id);
-		uint16_t seq = ntohs(icmp_hdr->icmp_seq);
+		uint16_t id, seq;
 
-		// Vérifier que c'est bien NOTRE paquet (bon PID)
+		// NOUVEAU : Extraire id et seq selon le type de paquet
+		if (type == ICMP_TIME_EXCEEDED || type == ICMP_DEST_UNREACH) {
+			// Pour les erreurs ICMP, le paquet original est encapsulé
+			struct ip *orig_ip = (struct ip *)(buffer + ip_header_len + 8);
+			int orig_ip_len = orig_ip->ip_hl * 4;
+			struct icmp *orig_icmp = (struct icmp *)((char *)orig_ip + orig_ip_len);
+
+			id = ntohs(orig_icmp->icmp_id);
+			seq = ntohs(orig_icmp->icmp_seq);
+		} else {
+			// Pour ECHO_REPLY, lire normalement
+			id = ntohs(icmp_hdr->icmp_id);
+			seq = ntohs(icmp_hdr->icmp_seq);
+		}
+
+		// Vérifier NOTRE paquet via PID
 		if (id != ping->pid) {
-			continue;  // Ignorer, c'est un autre processus ping
+			continue;  // Ignorer, autre processus ping
 		}
 
 		// Vérifier la séquence
 		if (seq != ping->seq) {
-			continue;  // Ignorer, c'est une vieille réponse ou un duplicata
+			continue;  // Ignorer, vieille réponse ou duplicata
 		}
 
-		// On a reçu le bon paquet !
+		// Bon paquet - calculer RTT
 		struct timeval recv_time;
 		gettimeofday(&recv_time, NULL);
 
 		double rtt = (recv_time.tv_sec - ping->tv.tv_sec) * 1000.0 +
 					 (recv_time.tv_usec - ping->tv.tv_usec) / 1000.0;
 
+		// Traiter selon le type
 		if (type == ICMP_ECHOREPLY) {
 			stats->received++;
 
@@ -156,17 +171,23 @@ int receive_ping(t_ping *ping, t_stats *stats) {
 
 			return 0;
 		}
-		else if (type == ICMP_TIME_EXCEEDED && ping->verbose) {
-			char ip_str[INET_ADDRSTRLEN];
-			inet_ntop(AF_INET, &ip_hdr->ip_src, ip_str, sizeof(ip_str));
-			printf("From %s icmp_seq=%d Time to live exceeded\n", ip_str, seq);
+		else if (type == ICMP_TIME_EXCEEDED) {
+			// MODIFIÉ : Afficher seulement si verbose
+			if (ping->verbose) {
+				char ip_str[INET_ADDRSTRLEN];
+				inet_ntop(AF_INET, &ip_hdr->ip_src, ip_str, sizeof(ip_str));
+				printf("From %s icmp_seq=%d Time to live exceeded\n", ip_str, seq);
+			}
 			return -1;
 		}
-		else if (type == ICMP_DEST_UNREACH && ping->verbose) {
-			char ip_str[INET_ADDRSTRLEN];
-			inet_ntop(AF_INET, &ip_hdr->ip_src, ip_str, sizeof(ip_str));
-			printf("From %s icmp_seq=%d Destination Unreachable (code=%d)\n",
-				   ip_str, seq, code);
+		else if (type == ICMP_DEST_UNREACH) {
+			// MODIFIÉ : Afficher seulement si verbose
+			if (ping->verbose) {
+				char ip_str[INET_ADDRSTRLEN];
+				inet_ntop(AF_INET, &ip_hdr->ip_src, ip_str, sizeof(ip_str));
+				printf("From %s icmp_seq=%d Destination Unreachable (code=%d)\n",
+					   ip_str, seq, code);
+			}
 			return -1;
 		}
 	}
@@ -174,9 +195,140 @@ int receive_ping(t_ping *ping, t_stats *stats) {
 	return -1;
 }
 
+
+// int receive_ping(t_ping *ping, t_stats *stats) {
+// 	char buffer[1024];
+// 	struct sockaddr_in src_addr;
+// 	socklen_t addr_len = sizeof(src_addr);
+// 	struct timeval deadline, now, timeout;
+// 	fd_set read_fds;
+
+// 	// Calculer deadline
+// 	double wait_time = (ping->timeout > 0) ? ping->timeout : ping->interval;
+// 	gettimeofday(&deadline, NULL);
+// 	deadline.tv_sec += (int)wait_time;
+// 	deadline.tv_usec += (int)((wait_time - (int)wait_time) * 1000000);
+// 	if (deadline.tv_usec >= 1000000) {
+// 		deadline.tv_sec++;
+// 		deadline.tv_usec -= 1000000;
+// 	}
+
+// 	// Boucle pour ignorer les paquets qui ne correspondent pas
+// 	while (ping->running) {
+// 		// Calculer temps restant avant deadline
+// 		gettimeofday(&now, NULL);
+
+// 		timeout.tv_sec = deadline.tv_sec - now.tv_sec;
+// 		timeout.tv_usec = deadline.tv_usec - now.tv_usec;
+
+// 		if (timeout.tv_usec < 0) {
+// 			timeout.tv_sec--;
+// 			timeout.tv_usec += 1000000;
+// 		}
+
+// 		// timeout dépassé
+// 		if (timeout.tv_sec < 0) {
+// 			printf("Request timeout for icmp_seq %d\n", ping->seq);
+// 			return -1;
+// 		}
+
+// 		FD_ZERO(&read_fds);
+// 		FD_SET(ping->sockfd, &read_fds);
+
+// 		int ready = select(ping->sockfd + 1, &read_fds, NULL, NULL, &timeout);
+
+// 		if (ready < 0) {
+// 			if (ping->running) {
+// 				perror("select");
+// 			}
+// 			return -1;
+// 		}
+
+// 		if (ready == 0) {
+// 			printf("Request timeout for icmp_seq %d\n", ping->seq);
+// 			return -1;
+// 		}
+
+// 		ssize_t bytes = recvfrom(ping->sockfd, buffer, sizeof(buffer), 0,
+// 								 (struct sockaddr *)&src_addr, &addr_len);
+
+// 		if (bytes < 0) {
+// 			if (ping->running) {
+// 				perror("recvfrom");
+// 			}
+// 			return -1;
+// 		}
+
+// 		struct ip *ip_hdr = (struct ip *)buffer;
+// 		int ip_header_len = ip_hdr->ip_hl * 4;
+// 		struct icmp *icmp_hdr = (struct icmp *)(buffer + ip_header_len);
+
+// 		int type = icmp_hdr->icmp_type;
+// 		int code = icmp_hdr->icmp_code;
+// 		int ttl = ip_hdr->ip_ttl;
+// 		uint16_t id = ntohs(icmp_hdr->icmp_id);
+// 		uint16_t seq = ntohs(icmp_hdr->icmp_seq);
+
+// 		// Vérifier NOTRE paquet via PID
+// 		if (id != ping->pid) {
+// 			continue;  // Ignorer, autre processus ping
+// 		}
+
+// 		// Vérifier la séquence
+// 		if (seq != ping->seq) {
+// 			continue;  // Ignorer,vieille réponse ou duplicata
+// 		}
+
+// 		// Bon paquet
+// 		struct timeval recv_time;
+// 		gettimeofday(&recv_time, NULL);
+
+// 		double rtt = (recv_time.tv_sec - ping->tv.tv_sec) * 1000.0 +
+// 					 (recv_time.tv_usec - ping->tv.tv_usec) / 1000.0;
+
+// 		if (type == ICMP_ECHOREPLY) {
+// 			stats->received++;
+
+// 			if (rtt < stats->rtt_min) stats->rtt_min = rtt;
+// 			if (rtt > stats->rtt_max) stats->rtt_max = rtt;
+// 			stats->rtt_sum += rtt;
+// 			stats->rtt_sq_sum += rtt * rtt;
+
+// 			char ip_str[INET_ADDRSTRLEN];
+// 			inet_ntop(AF_INET, &ip_hdr->ip_src, ip_str, sizeof(ip_str));
+// 			printf("64 bytes from %s: icmp_seq=%d ttl=%d time=%.1f ms\n",
+// 				   ip_str, seq, ttl, rtt);
+
+// 			return 0;
+// 		}
+// 		else if (type == ICMP_TIME_EXCEEDED && ping->verbose) {
+// 			char ip_str[INET_ADDRSTRLEN];
+// 			inet_ntop(AF_INET, &ip_hdr->ip_src, ip_str, sizeof(ip_str));
+// 			printf("From %s icmp_seq=%d Time to live exceeded\n", ip_str, seq);
+// 			return -1;
+// 		}
+// 		else if (type == ICMP_DEST_UNREACH && ping->verbose) {
+// 			char ip_str[INET_ADDRSTRLEN];
+// 			inet_ntop(AF_INET, &ip_hdr->ip_src, ip_str, sizeof(ip_str));
+// 			printf("From %s icmp_seq=%d Destination Unreachable (code=%d)\n",
+// 				   ip_str, seq, code);
+// 			return -1;
+// 		}
+// 	}
+
+// 	return -1;
+// }
+
 void do_ping(t_ping *ping, t_stats *stats) {
 	char ip_str[INET_ADDRSTRLEN];
 	inet_ntop(AF_INET, &ping->dest_addr.sin_addr, ip_str, sizeof(ip_str));
+
+	if (ping->verbose) {
+	printf("ping: sock.fd: %d (socktype: SOCK_RAW), ai_family: AF_INET\n",
+		ping->sockfd);
+	printf("ai->ai_family: AF_INET, ai->ai_canonname: '%s'\n",
+		ping->hostname);
+	}
 
 	printf("PING %s (%s) 56(84) bytes of data.\n", ping->hostname, ip_str);
 

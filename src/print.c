@@ -33,7 +33,7 @@ void print_stats(t_ping *ping, t_stats *stats) {
 	printf("%d packets transmitted, %d received, %d%% packet loss, time %ldms\n",
 		   stats->transmitted, stats->received, packet_loss, total_ms);
 
-	// Afficher les statistiques RTT si on a reçu au moins un paquet
+	// Afficher les stats RTT si on a reçu au moins un paquet
 	if (stats->received > 0) {
 		double avg = stats->rtt_sum / stats->received;
 

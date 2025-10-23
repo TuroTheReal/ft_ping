@@ -21,7 +21,7 @@
 typedef struct s_ping {
 	// Mandatory
 	char *hostname;
-	int verbose; // -v a faire
+	int verbose; // -v OK
 	int running; // 1 par defaut
 
 	// Bonus

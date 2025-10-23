@@ -14,7 +14,7 @@ int main(int ac, char **av) {
 		.dest_addr = {0},
 		.interval = 1.0,
 		.timeout = 1.0,
-		.ttl = 64,
+		.ttl = -1,
 		.running = 1,
 		.pid = getpid() & 0xFFFF,
 		.seq = 1,

@@ -1,6 +1,5 @@
 #include "ft_ping.h"
 
-// Fonction pour valider les options avant getopt_long
 void validate_options(int argc, char **argv) {
 	for (int i = 1; i < argc; i++) {
 		if (argv[i][0] == '-' && argv[i][1] == '-') {
@@ -34,7 +33,7 @@ void parse_args(int argc, char** argv, t_ping *ping) {
 
 	validate_options(argc, argv);
 
-	opterr = 0;  // Désactiver les messages d'erreur auto de getopt
+	opterr = 0;  // Désactiver msg erreur auto getopt
 
 	while ((opt = getopt_long(argc, argv, "vV?c:i:W:t:h", long_options, NULL)) != -1) {
 		switch (opt) {
@@ -82,7 +81,7 @@ void parse_args(int argc, char** argv, t_ping *ping) {
 			}
 			case '?':
 				if (optopt == 0) {
-					// C'est -?
+					// -?
 					print_help();
 					exit(0);
 				} else {
