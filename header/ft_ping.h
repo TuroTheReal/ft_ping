@@ -3,6 +3,7 @@
 
 #include <arpa/inet.h> // inet pton & ntop
 #include <ctype.h> // is*
+#include <errno.h> // errno const
 #include <getopt.h> // getopt()
 #include <math.h> // INFINITY
 #include <netdb.h>  // Pour getaddrinfo, struct addrinfo, gai_strerror
