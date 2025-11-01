@@ -7,7 +7,7 @@ void	print_version(){
 void print_help() {
 	printf("Usage: ./ft_ping [options] <hostname>\n");
 	printf("Options:\n");
-	printf("  -V				version\n");
+	printf("  -V, --version			print program version\n");
 	printf("  -v, --verbose			verbose output\n");
 	printf("  -?, -h, --help		give this help list\n");
 }

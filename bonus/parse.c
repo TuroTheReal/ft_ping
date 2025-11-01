@@ -18,7 +18,7 @@ void validate_options(int argc, char **argv) {
 		}
 		else if (argv[i][0] == '-' && argv[i][1] != '\0') {
 			// Vérifier que c'est une option courte valide (1 seul caractère après -)
-			if (argv[i][2] != '\0' && argv[i][1] != '-') {
+			if (argv[i][2] != '\0' && argv[i][1] != '-' && ((argv[i][1] == 'v') || (argv[i][1] == 'h') || (argv[i][1] == 'V'))) {
 				// C'est une chaîne comme -help, -ttl, etc.
 				fprintf(stderr, "ping: unrecognized option '%s'\n", argv[i]);
 				print_help();
@@ -52,8 +52,8 @@ void parse_args(int argc, char** argv, t_ping *ping) {
 			case 'c': {
 				char *endptr;
 				ping->count = strtol(optarg, &endptr, 10);
-				if (*endptr != '\0' || ping->count < 0) {
-					fprintf(stderr, "ping: invalid argument: '%s'\n", optarg);
+				if (*endptr != '\0' || (ping->count <= 0 || ping->count >= INT32_MAX)) {
+					fprintf(stderr, "ping: invalid argument: '%s': out of range: 1 <= value <= 2147483647\n", optarg);
 					exit(1);
 				}
 				break;
