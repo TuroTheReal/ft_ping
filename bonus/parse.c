@@ -52,7 +52,11 @@ void parse_args(int argc, char** argv, t_ping *ping) {
 			case 'c': {
 				char *endptr;
 				ping->count = strtol(optarg, &endptr, 10);
-				if (*endptr != '\0' || (ping->count <= 0 || ping->count >= INT32_MAX)) {
+				if (*endptr != '\0') {
+					fprintf(stderr, "ping: invalid argument: '%s'\n", optarg);
+					exit(1);
+				}
+				else if (ping->count <= 0 || ping->count >= INT32_MAX) {
 					fprintf(stderr, "ping: invalid argument: '%s': out of range: 1 <= value <= 2147483647\n", optarg);
 					exit(1);
 				}
@@ -61,10 +65,10 @@ void parse_args(int argc, char** argv, t_ping *ping) {
 			case 'i': {
 				char *endptr;
 				ping->interval = strtod(optarg, &endptr);
-				if (*endptr != '\0' || ping->interval <= 0) {
-					fprintf(stderr, "ping: invalid argument: '%s'\n", optarg);
-					exit(1);
-				}
+
+				if (*endptr != '\0' || ping->interval < 0)
+					ping->interval = 0;
+
 				if (ping->interval < 0.2 && getuid() != 0) {
 					fprintf(stderr, "ping: cannot flood; minimal interval allowed is 200ms\n");
 					exit(1);
@@ -86,8 +90,16 @@ void parse_args(int argc, char** argv, t_ping *ping) {
 			case 't': {
 				char *endptr;
 				ping->ttl = strtol(optarg, &endptr, 10);
-				if (*endptr != '\0' || ping->ttl <= 0 || ping->ttl > 255) {
+				if (*endptr != '\0') {
 					fprintf(stderr, "ping: invalid argument: '%s'\n", optarg);
+					exit(1);
+				}
+				else if (ping->ttl == 0){
+					fprintf(stderr, "ping: cannot set unicast time-to-live: invalid argument: '%s'\n", optarg);
+					exit(1);
+				}
+				if (ping->ttl < 0 || ping->ttl > 255){
+					fprintf(stderr, "ping: invalid argument: '%s': out of range: 0 <= value <= 255\n", optarg);
 					exit(1);
 				}
 				break;
