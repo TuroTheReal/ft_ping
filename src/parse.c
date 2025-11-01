@@ -49,7 +49,7 @@ void parse_args(int argc, char** argv, t_ping *ping) {
 				} else {
 					// Option invalide
 					fprintf(stderr, "ping: invalid option -- '%c'\n", optopt);
-					print_help();
+					fprintf(stderr, "Try 'ping --help' for more information.\n");
 					exit(1);
 				}
 				break;
@@ -64,7 +64,7 @@ void parse_args(int argc, char** argv, t_ping *ping) {
 
 	if (optind >= argc || argv[optind][0] == '-') {
 		fprintf(stderr, "ping: missing or invalid hostname\n");
-		fprintf(stderr, "Try 'ping --help' or 'ping --usage' for more information.\n");
+		fprintf(stderr, "Try 'ping --help' for more information.\n");
 		exit(2);
 	}
 	ping->hostname = argv[optind];

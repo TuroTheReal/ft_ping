@@ -83,7 +83,7 @@ int receive_ping(t_ping *ping, t_stats *stats) {
 
 		// timeout dépassé
 		if (timeout.tv_sec < 0) {
-			// printf("Request timeout for icmp_seq %d\n", ping->seq);
+			printf("Request timeout for icmp_seq %d\n", ping->seq);
 			return -1;
 		}
 
