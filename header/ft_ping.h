@@ -2,7 +2,7 @@
 #define FT_PING_H
 
 #include <arpa/inet.h> // inet pton & ntop
-#include <ctype.h> // is*
+#include <ctype.h> // is_*
 #include <errno.h> // errno const
 #include <getopt.h> // getopt()
 #include <math.h> // INFINITY
@@ -28,8 +28,8 @@ typedef struct s_ping {
 	// Bonus
 	int count;			// -c (0 = infini) OK
 	double interval;	// -i (1.0 par défaut) OK
-	double timeout;		// -W (1.0 par défaut) a faire
-	int ttl;			// -t / --ttl (64 par défaut) a finir
+	double timeout;		// -W (1.0 par défaut) OK
+	int ttl;			// -t / --ttl (64 par défaut) OK
 
 	// Données internes
 	int sockfd;			// Socket descriptor
@@ -50,7 +50,6 @@ typedef struct s_stats {
 	double rtt_sq_sum;	// Pour calculer mdev (écart-type)
 } t_stats;
 
-// Structure globale pour signal + stats
 typedef struct s_global {
 	t_ping *ping;
 	t_stats *stats;

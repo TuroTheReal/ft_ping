@@ -4,7 +4,12 @@ void validate_options(int argc, char **argv) {
 	for (int i = 1; i < argc; i++) {
 		if (argv[i][0] == '-' && argv[i][1] == '-') {
 			// Options longues valides
-			if (strcmp(argv[i], "--help") != 0 &&
+			if (strcmp(argv[i], "--count") != 0 &&
+				strcmp(argv[i], "--interval") != 0 &&
+				strcmp(argv[i], "--verbose") != 0 &&
+				strcmp(argv[i], "--linger") != 0 &&
+				strcmp(argv[i], "--help") != 0 &&
+				strcmp(argv[i], "--version") != 0 &&
 				strcmp(argv[i], "--ttl") != 0) {
 				fprintf(stderr, "ping: unrecognized option '%s'\n", argv[i]);
 				print_help();
@@ -26,6 +31,11 @@ void validate_options(int argc, char **argv) {
 void parse_args(int argc, char** argv, t_ping *ping) {
 	int opt;
 	static struct option long_options[] = {
+		{"count", required_argument, NULL, 'c'},
+		{"interval", required_argument, NULL, 'i'},
+		{"verbose", no_argument, NULL, 'v'},
+		{"version", no_argument, NULL, 'V'},
+		{"linger", required_argument, NULL, 'W'},
 		{"ttl", required_argument, NULL, 't'},
 		{"help", no_argument, NULL, 'h'},
 		{0, 0, 0, 0}
@@ -42,7 +52,7 @@ void parse_args(int argc, char** argv, t_ping *ping) {
 			case 'c': {
 				char *endptr;
 				ping->count = strtol(optarg, &endptr, 10);
-				if (*endptr != '\0' || ping->count <= 0) {
+				if (*endptr != '\0' || ping->count < 0) {
 					fprintf(stderr, "ping: invalid argument: '%s'\n", optarg);
 					exit(1);
 				}
@@ -65,7 +75,10 @@ void parse_args(int argc, char** argv, t_ping *ping) {
 				char *endptr;
 				ping->timeout = strtod(optarg, &endptr);
 				if (*endptr != '\0' || ping->timeout < 0) {
-					fprintf(stderr, "ping: invalid argument: '%s'\n", optarg);
+					if (*endptr != '\0')
+						fprintf(stderr, "ping: invalid argument: '%s'\n", optarg);
+					else
+						fprintf(stderr, "ping: bad linger time: '%s'\n", optarg);
 					exit(1);
 				}
 				break;
@@ -102,6 +115,7 @@ void parse_args(int argc, char** argv, t_ping *ping) {
 
 	if (optind >= argc || argv[optind][0] == '-') {
 		fprintf(stderr, "ping: missing or invalid hostname\n");
+		fprintf(stderr, "Try 'ping --help' or 'ping --usage' for more information.\n");
 		exit(2);
 	}
 	ping->hostname = argv[optind];

@@ -4,7 +4,9 @@ void validate_options(int argc, char **argv) {
 	for (int i = 1; i < argc; i++) {
 		if (argv[i][0] == '-' && argv[i][1] == '-') {
 			// Options longues valides
-			if (strcmp(argv[i], "--help") != 0){
+			if (strcmp(argv[i], "--verbose") != 0 &&
+				strcmp(argv[i], "--help") != 0 &&
+				strcmp(argv[i], "--version") != 0) {
 				fprintf(stderr, "ping: unrecognized option '%s'\n", argv[i]);
 				print_help();
 				exit(1);
@@ -25,6 +27,8 @@ void validate_options(int argc, char **argv) {
 void parse_args(int argc, char** argv, t_ping *ping) {
 	int opt;
 	static struct option long_options[] = {
+		{"verbose", no_argument, NULL, 'v'},
+		{"version", no_argument, NULL, 'V'},
 		{"help", no_argument, NULL, 'h'},
 		{0, 0, 0, 0}
 	};
@@ -60,6 +64,7 @@ void parse_args(int argc, char** argv, t_ping *ping) {
 
 	if (optind >= argc || argv[optind][0] == '-') {
 		fprintf(stderr, "ping: missing or invalid hostname\n");
+		fprintf(stderr, "Try 'ping --help' or 'ping --usage' for more information.\n");
 		exit(2);
 	}
 	ping->hostname = argv[optind];

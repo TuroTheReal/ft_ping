@@ -7,12 +7,13 @@ void	print_version(){
 void print_help() {
 	printf("Usage: ./ft_ping [options] <hostname>\n");
 	printf("Options:\n");
-	printf("  -v			Enable verbose output\n");
-	printf("  -c <count>	Set the number of packets to send\n");
-	printf("  -i <interval> Set the interval between packets\n");
-	printf("  -W <timeout>  Set the timeout for receiving a reply\n");
-	printf("  -t <ttl>	 	Set the Time To Live\n");
-	printf("  --ttl <ttl>  	Set the Time To Live (long format)\n");
+	printf("  -c, --count=NUMBER		stop after sending NUMBER packets\n");
+	printf("  -i, --interval=NUMBER		wait NUMBER seconds between sending each packet\n");
+	printf("  -v, --verbose			verbose output\n");
+	printf("  -V, --version				print program version\n");
+	printf("  -t, --ttl=N			specify N as time-to-live\n");
+	printf("  -W, --linger=N		number of seconds to wait for response\n");
+	printf("  -?, -h, --help		give this help list\n");
 }
 
 void print_stats(t_ping *ping, t_stats *stats) {
