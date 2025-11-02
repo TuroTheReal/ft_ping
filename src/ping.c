@@ -194,13 +194,11 @@ void do_ping(t_ping *ping, t_stats *stats) {
 	inet_ntop(AF_INET, &ping->dest_addr.sin_addr, ip_str, sizeof(ip_str));
 
 	if (ping->verbose) {
-	printf("ping: sock.fd: %d (socktype: SOCK_RAW), hints.ai_family: AF_UNSPEC\n",
-		ping->sockfd);
-	printf("ai->ai_family: AF_INET, ai->ai_canonname: '%s'\n",
-		ping->hostname);
+		long id = getpid() & 0xFFFF;
+		printf("PING %s (%s) 56(84) bytes of data, id %lx = %d\n", ping->hostname, ip_str, id, (int)id);
 	}
-
-	printf("PING %s (%s) 56(84) bytes of data.\n", ping->hostname, ip_str);
+	else
+		printf("PING %s (%s) 56(84) bytes of data.\n", ping->hostname, ip_str);
 
 	while (ping->running) {
 		if (ping->count > 0 && stats->transmitted >= ping->count) {
