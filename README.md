@@ -231,16 +231,16 @@ sudo ./ft_ping github.com
 sudo ./ft_ping -v google.com
 
 # Test packet count
-sudo ./ft_ping -c 10 8.8.8.8
+sudo ./ft_ping_bonus -c 10 8.8.8.8
 
 # Test custom interval
-sudo ./ft_ping -i 0.2 google.com
+sudo ./ft_ping_bonus -i 0.2 google.com
 
 # Test timeout
-sudo ./ft_ping -w 5 unreachable-host.com
+sudo ./ft_ping_bonus -w 5 unreachable-host.com
 
 # Combined options
-sudo ./ft_ping -v -c 5 -i 0.5 8.8.8.8
+sudo ./ft_ping_bonus -v -c 5 -i 0.5 8.8.8.8
 ```
 
 ### Edge Cases
