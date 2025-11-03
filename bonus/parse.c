@@ -7,7 +7,7 @@ void validate_options(int argc, char **argv) {
 			if (strcmp(argv[i], "--count") != 0 &&
 				strcmp(argv[i], "--interval") != 0 &&
 				strcmp(argv[i], "--verbose") != 0 &&
-				strcmp(argv[i], "--linger") != 0 &&
+				strcmp(argv[i], "--timeout") != 0 &&
 				strcmp(argv[i], "--help") != 0 &&
 				strcmp(argv[i], "--version") != 0 &&
 				strcmp(argv[i], "--ttl") != 0) {
@@ -35,7 +35,7 @@ void parse_args(int argc, char** argv, t_ping *ping) {
 		{"interval", required_argument, NULL, 'i'},
 		{"verbose", no_argument, NULL, 'v'},
 		{"version", no_argument, NULL, 'V'},
-		{"linger", required_argument, NULL, 'W'},
+		{"timeout", required_argument, NULL, 'w'},
 		{"ttl", required_argument, NULL, 't'},
 		{"help", no_argument, NULL, 'h'},
 		{0, 0, 0, 0}
@@ -45,7 +45,7 @@ void parse_args(int argc, char** argv, t_ping *ping) {
 
 	opterr = 0;  // Désactiver msg erreur auto getopt
 
-	while ((opt = getopt_long(argc, argv, "vV?c:i:W:t:h", long_options, NULL)) != -1) {
+	while ((opt = getopt_long(argc, argv, "vV?c:i:w:t:h", long_options, NULL)) != -1) {
 		switch (opt) {
 			case 'v': ping->verbose = 1; break;
 			case 'V': print_version(); exit(0);
@@ -75,14 +75,16 @@ void parse_args(int argc, char** argv, t_ping *ping) {
 				}
 				break;
 			}
-			case 'W': {
+			case 'w': {
 				char *endptr;
 				ping->timeout = strtod(optarg, &endptr);
-				if (*endptr != '\0' || ping->timeout < 0) {
+				if (*endptr != '\0' || (ping->timeout <= 0 || ping->timeout > INT32_MAX)) {
 					if (*endptr != '\0')
 						fprintf(stderr, "ping: invalid argument: '%s'\n", optarg);
+					else if (ping->timeout <= 0)
+						fprintf(stderr, "ping: option value too small: '%s'\n", optarg);
 					else
-						fprintf(stderr, "ping: bad linger time: '%s'\n", optarg);
+						fprintf(stderr, "ping: option value too big: '%s'\n", optarg);
 					exit(1);
 				}
 				break;

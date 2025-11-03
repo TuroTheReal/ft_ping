@@ -59,8 +59,9 @@ int receive_ping(t_ping *ping, t_stats *stats) {
 	fd_set read_fds;
 
 	// Calculer deadline
-	double wait_time = (ping->timeout > 0) ? ping->timeout : ping->interval;
+	double wait_time = ping->interval;
 	gettimeofday(&deadline, NULL);
+
 	deadline.tv_sec += (int)wait_time;
 	deadline.tv_usec += (int)((wait_time - (int)wait_time) * 1000000);
 	if (deadline.tv_usec >= 1000000) {
@@ -194,15 +195,29 @@ void do_ping(t_ping *ping, t_stats *stats) {
 	inet_ntop(AF_INET, &ping->dest_addr.sin_addr, ip_str, sizeof(ip_str));
 
 	if (ping->verbose) {
-	printf("ping: sock.fd: %d (socktype: SOCK_RAW), hints.ai_family: AF_UNSPEC\n",
-		ping->sockfd);
-	printf("ai->ai_family: AF_INET, ai->ai_canonname: '%s'\n",
-		ping->hostname);
+		printf("ping: sock.fd: %d (socktype: SOCK_RAW), hints.ai_family: AF_UNSPEC\n",
+			ping->sockfd);
+		printf("ai->ai_family: AF_INET, ai->ai_canonname: '%s'\n",
+			ping->hostname);
 	}
 
 	printf("PING %s (%s) 56(84) bytes of data.\n", ping->hostname, ip_str);
 
+	// Enregistrer le temps de début pour le timeout global
+	struct timeval start_time, current_time;
+	gettimeofday(&start_time, NULL);
+
 	while (ping->running) {
+		// Vérifier le timeout global
+		if (ping->timeout > 0) {
+			gettimeofday(&current_time, NULL);
+			double elapsed = (current_time.tv_sec - start_time.tv_sec) + (current_time.tv_usec - start_time.tv_usec) / 1000000.0;
+
+			if (elapsed >= ping->timeout) {
+				break;
+			}
+		}
+
 		if (ping->count > 0 && stats->transmitted >= ping->count) {
 			break;
 		}
