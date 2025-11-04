@@ -12,7 +12,7 @@ void print_help() {
 	printf("  -v, --verbose			verbose output\n");
 	printf("  -V, --version				print program version\n");
 	printf("  -t, --ttl=N			specify N as time-to-live\n");
-	printf("  -W, --linger=N		number of seconds to wait for response\n");
+	printf("  -w, --timeout=N		number of seconds to wait for response\n");
 	printf("  -?, -h, --help		give this help list\n");
 }
 
