@@ -15,7 +15,7 @@
 
 ## About
 
-This repository contains my implementation of the **ft_ping** project at 42 School.
+This repository contains my implementation of the **ft_ping** project.
 ft_ping is a recreation of the famous **ping** command-line utility, one of the most fundamental network diagnostic tools used worldwide since 1983.
 Built entirely in **C**, this program sends ICMP (Internet Control Message Protocol) echo requests to network hosts and measures round-trip time, packet loss, and network reachability using **raw sockets** and low-level network programming.
 
